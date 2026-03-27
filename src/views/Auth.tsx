@@ -128,7 +128,7 @@ const AuthView: React.FC<AuthViewProps> = ({ onLogin }) => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-600 rounded-2xl text-white shadow-xl shadow-brand-500/20 mb-4">
             <Shield size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Insurify</h1>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">InsureX</h1>
           <p className="text-slate-500 mt-2">Professional Broker Management System</p>
         </div>
 
@@ -374,7 +374,7 @@ const AuthView: React.FC<AuthViewProps> = ({ onLogin }) => {
         </div>
 
         <p className="text-center text-slate-400 text-xs mt-8">
-          &copy; 2026 Insurify Broker Systems. All rights reserved.
+          &copy; 2026 InsureX Broker Systems. All rights reserved.
         </p>
       </div>
     </div>
