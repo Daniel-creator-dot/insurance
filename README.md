@@ -198,7 +198,7 @@ TWILIO_PHONE_NUMBER=your_twilio_phone_number
 
 ### Frontend (.env)
 ```bash
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=https://insuranceapi-9r4t.onrender.com/api
 ```
 
 ## Usage
