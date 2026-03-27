@@ -51,7 +51,7 @@ app.use(helmet({
 
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? ['http://localhost:3000', 'http://127.0.0.1:3000']
+    ? ['https://insurance-rwgr.onrender.com', 'http://localhost:3000']
     : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3002', 'http://127.0.0.1:3002'],
   credentials: true
 }));
