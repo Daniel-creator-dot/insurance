@@ -186,6 +186,16 @@ const initDB = async () => {
     `);
 
     await query(`
+      CREATE TABLE IF NOT EXISTS otps (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        otp VARCHAR(6) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await query(`
       CREATE TABLE IF NOT EXISTS sms_configs (
         id SERIAL PRIMARY KEY,
         provider VARCHAR(50) NOT NULL,
