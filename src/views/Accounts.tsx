@@ -124,7 +124,6 @@ const AccountsView: React.FC<AccountsViewProps> = ({ activeSubTab }) => {
         alert('Too many requests. Please wait a moment and try again.');
       } else if (error.response?.status === 401) {
         alert('Session expired. Please log in again.');
-        window.location.href = '/login';
       } else {
         alert('Failed to load accounting data. Please check your connection and try again.');
       }

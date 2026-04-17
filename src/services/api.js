@@ -34,10 +34,15 @@ api.interceptors.response.use(
     const config = error.config;
 
     // Handle 401 - Unauthorized
+    // Skip redirect for login requests — let the login page show the error inline
     if (error.response?.status === 401) {
-      localStorage.removeItem('insurify_token');
-      localStorage.removeItem('insurify_user');
-      window.location.href = '/login';
+      const requestUrl = config?.url || '';
+      const isLoginRequest = requestUrl.includes('/auth/login');
+      if (!isLoginRequest) {
+        localStorage.removeItem('insurify_token');
+        localStorage.removeItem('insurify_user');
+        window.location.href = '/';
+      }
       return Promise.reject(error);
     }
 

@@ -196,6 +196,42 @@ const initDB = async () => {
     `);
 
     await query(`
+      CREATE TABLE IF NOT EXISTS activities (
+        id SERIAL PRIMARY KEY,
+        user_name VARCHAR(100) DEFAULT 'System',
+        action TEXT NOT NULL,
+        target TEXT,
+        time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        icon VARCHAR(50),
+        color VARCHAR(100),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS sms_templates (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS insurance_products (
+        id SERIAL PRIMARY KEY,
+        insurance_type VARCHAR(100) NOT NULL,
+        class_of_business VARCHAR(100) NOT NULL,
+        description TEXT,
+        commission_rate NUMERIC(5,2),
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await query(`
       CREATE TABLE IF NOT EXISTS sms_configs (
         id SERIAL PRIMARY KEY,
         provider VARCHAR(50) NOT NULL,

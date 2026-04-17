@@ -247,30 +247,11 @@ export const PolicyDistribution = () => {
         
         const data = response.data || [];
         console.log('Policy distribution data processed:', data);
-        
-        if (data.length === 0) {
-          console.log('No policy distribution data received, using mock data');
-          const pieData = [
-            { name: 'Life', value: 400 },
-            { name: 'Health', value: 300 },
-            { name: 'Auto', value: 300 },
-            { name: 'Home', value: 200 },
-          ];
-          setDistributionData(pieData);
-        } else {
-          setDistributionData(data);
-        }
+        setDistributionData(data);
       } catch (error) {
         console.error('Error fetching policy distribution:', error);
         setError(error.message);
-        // Use mock data as fallback
-        const pieData = [
-          { name: 'Life', value: 400 },
-          { name: 'Health', value: 300 },
-          { name: 'Auto', value: 300 },
-          { name: 'Home', value: 200 },
-        ];
-        setDistributionData(pieData);
+        setDistributionData([]);
       } finally {
         setLoading(false);
       }

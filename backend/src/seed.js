@@ -5,13 +5,17 @@ async function seedDatabase() {
   try {
     console.log('Seeding database...');
 
-    // Clear existing data
+    // Clear existing data (in correct dependency order)
     await query('DELETE FROM activities');
+    await query('DELETE FROM sms_templates');
+    await query('DELETE FROM insurance_products');
+    await query('DELETE FROM journal_entries');
     await query('DELETE FROM accounts');
     await query('DELETE FROM sms_logs');
     await query('DELETE FROM policies');
     await query('DELETE FROM leads');
     await query('DELETE FROM clients');
+    await query('DELETE FROM otps');
     await query('DELETE FROM users');
 
     // Seed Users
@@ -222,6 +226,37 @@ async function seedDatabase() {
       await query(
         'INSERT INTO sms_logs (recipient, message, status, sent_at) VALUES ($1, $2, $3, $4)',
         [sms.recipient, sms.message, sms.status, sms.status === 'Sent' ? new Date() : null]
+      );
+    }
+
+    // Seed SMS Templates
+    const smsTemplates = [
+      { name: 'Policy Renewal Reminder', content: 'Dear client, your policy {{policy_number}} is expiring on {{expiry_date}}. Please contact us for renewal.' },
+      { name: 'Welcome Message', content: 'Welcome to Insurify! Your account has been successfully created. We are happy to serve you.' },
+      { name: 'Payment Received', content: 'We have received your payment for policy {{policy_number}}. Thank you for your business.' },
+      { name: 'Lead Follow-up', content: 'Hi {{name}}, we are following up on your inquiry about our insurance products. Are you still interested?' }
+    ];
+
+    for (const template of smsTemplates) {
+      await query(
+        'INSERT INTO sms_templates (name, content) VALUES ($1, $2)',
+        [template.name, template.content]
+      );
+    }
+
+    // Seed Insurance Products
+    const insuranceProducts = [
+      { insurance_type: 'Health', class_of_business: 'Individual Health', description: 'Health insurance for individuals', commission_rate: 15.00 },
+      { insurance_type: 'Health', class_of_business: 'Corporate Health', description: 'Group health insurance for companies', commission_rate: 12.50 },
+      { insurance_type: 'Life', class_of_business: 'Term Life', description: 'Life insurance for a specific term', commission_rate: 20.00 },
+      { insurance_type: 'Auto', class_of_business: 'Comprehensive', description: 'Full coverage auto insurance', commission_rate: 16.50 },
+      { insurance_type: 'Auto', class_of_business: 'Third Party', description: 'Basic liability auto insurance', commission_rate: 10.00 }
+    ];
+
+    for (const product of insuranceProducts) {
+      await query(
+        'INSERT INTO insurance_products (insurance_type, class_of_business, description, commission_rate) VALUES ($1, $2, $3, $4)',
+        [product.insurance_type, product.class_of_business, product.description, product.commission_rate]
       );
     }
 

@@ -31,6 +31,52 @@ interface DashboardProps {
   onNavigate?: (tab: string) => void;
 }
 
+const LEGEND_COLORS = ['bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-red-500', 'bg-violet-500'];
+
+const PolicyDistributionLegend: React.FC = () => {
+  const [legendData, setLegendData] = useState<{label: string; value: string; color: string}[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await dashboardAPI.getPolicyDistribution();
+        const data = response.data || [];
+        if (data.length > 0) {
+          const total = data.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
+          setLegendData(data.map((item: any, index: number) => ({
+            label: item.name || 'Unknown',
+            value: total > 0 ? `${Math.round((item.value / total) * 100)}%` : '0%',
+            color: LEGEND_COLORS[index % LEGEND_COLORS.length],
+          })));
+        } else {
+          setLegendData([]);
+        }
+      } catch {
+        setLegendData([]);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (legendData.length === 0) {
+    return <p className="text-xs text-slate-400 mt-4 text-center">No distribution data available</p>;
+  }
+
+  return (
+    <div className="space-y-3 mt-4">
+      {legendData.map((item) => (
+        <div key={item.label} className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
+            <span className="text-xs text-slate-500">{item.label}</span>
+          </div>
+          <span className="text-xs font-bold text-slate-700">{item.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const Dashboard: React.FC<DashboardProps> = ({ role, onNavigate }) => {
   const [isAddPolicyModalOpen, setIsAddPolicyModalOpen] = useState(false);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
@@ -192,22 +238,7 @@ const Dashboard: React.FC<DashboardProps> = ({ role, onNavigate }) => {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h3 className="font-bold text-slate-800 mb-6">Policy Distribution</h3>
           <PolicyDistribution />
-          <div className="space-y-3 mt-4">
-            {[
-              { label: 'Life Insurance', value: '40%', color: 'bg-blue-500' },
-              { label: 'Health Insurance', value: '30%', color: 'bg-emerald-500' },
-              { label: 'Auto Insurance', value: '20%', color: 'bg-amber-500' },
-              { label: 'Home Insurance', value: '10%', color: 'bg-red-500' },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
-                  <span className="text-xs text-slate-500">{item.label}</span>
-                </div>
-                <span className="text-xs font-bold text-slate-700">{item.value}</span>
-              </div>
-            ))}
-          </div>
+          <PolicyDistributionLegend />
         </div>
       </div>
 
