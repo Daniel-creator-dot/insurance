@@ -181,7 +181,7 @@ export default function App() {
         {/* Footer */}
         <footer className="px-6 py-4 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-slate-400 font-medium tracking-tight">
-            &copy; 2026 Insurify Broker Systems. All rights reserved.
+            &copy; 2026 Kesbridge. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <a href="#" className="text-xs text-slate-400 hover:text-slate-600 font-medium">Privacy Policy</a>

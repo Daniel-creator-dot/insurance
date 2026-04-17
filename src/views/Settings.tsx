@@ -510,7 +510,7 @@ const SettingsView: React.FC<SettingsProps> = ({ role }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Company Name</label>
-                      <input type="text" defaultValue="Insurify Brokerage Ltd." className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none" />
+                      <input type="text" defaultValue="Kesbridge" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Tax ID / Registration</label>
@@ -518,7 +518,7 @@ const SettingsView: React.FC<SettingsProps> = ({ role }) => {
                     </div>
                     <div className="md:col-span-2 space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Office Address</label>
-                      <textarea rows={3} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none resize-none">123 Financial District, Suite 500, New York, NY 10001</textarea>
+                      <textarea rows={3} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none resize-none" defaultValue="Mathehko-Acca Prime care"></textarea>
                     </div>
                   </div>
                 </div>

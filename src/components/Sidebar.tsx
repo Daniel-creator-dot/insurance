@@ -88,12 +88,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-6 flex items-center justify-between">
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold">I</div>
-            <span className="font-bold text-xl tracking-tight text-slate-800">InsureX</span>
+            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold">K</div>
+            <span className="font-bold text-xl tracking-tight text-slate-800">Kesbridge</span>
           </div>
         )}
         {collapsed && (
-          <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold mx-auto">I</div>
+          <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold mx-auto">K</div>
         )}
       </div>
 
