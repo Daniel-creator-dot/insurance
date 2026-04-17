@@ -38,6 +38,8 @@ const AccountsView: React.FC<AccountsViewProps> = ({ activeSubTab }) => {
   const [salaryLoading, setSalaryLoading] = useState(false);
   const [savingSalaries, setSavingSalaries] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [financeStats, setFinanceStats] = useState<any>({ total_income: 0, total_expense: 0, net_profit: 0 });
+  const [monthlyStats, setMonthlyStats] = useState<any>({ monthly_income: 0, monthly_expense: 0, monthly_profit: 0 });
 
   // Form states
   const [chequeForm, setChequeForm] = useState({ payee: '', amount: '', issued_date: new Date().toISOString().split('T')[0], status: 'Pending' });
@@ -60,6 +62,7 @@ const AccountsView: React.FC<AccountsViewProps> = ({ activeSubTab }) => {
     try {
       switch (currentSection) {
         case 'reconciliation': {
+          // Fetch accounts for the table
           const response = await accountAPI.getAll(10, 0);
           const accountsData = response.data.accounts || response.data || [];
           setTransactions(accountsData.map((account: any) => ({
@@ -70,6 +73,18 @@ const AccountsView: React.FC<AccountsViewProps> = ({ activeSubTab }) => {
             icon: account.type === 'income' ? ArrowUpRight : ArrowDownRight,
             color: account.type === 'income' ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'
           })));
+
+          // concurrently fetch financial stats
+          try {
+            const statsRes = await accountAPI.getStats();
+            setFinanceStats(statsRes.data || { total_income: 0, total_expense: 0, net_profit: 0 });
+            
+            const now = new Date();
+            const monthlyRes = await accountAPI.getMonthlyStats(now.getMonth() + 1, now.getFullYear());
+            setMonthlyStats(monthlyRes.data || { monthly_income: 0, monthly_expense: 0, monthly_profit: 0 });
+          } catch (statsError) {
+            console.error('Error fetching financial stats:', statsError);
+          }
           break;
         }
         case 'journal': {
@@ -389,9 +404,24 @@ const AccountsView: React.FC<AccountsViewProps> = ({ activeSubTab }) => {
           <p className="text-slate-500">Here you would reconcile bank statements with ledger entries.</p>
           {/* existing transaction summary could live here */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard title="Total Balance" value="GH₵125,400" icon={Wallet} color="blue" />
-            <StatCard title="Monthly Revenue" value="GH₵42,500" icon={TrendingUp} trend={{ value: 12, isPositive: true }} color="green" />
-            <StatCard title="Monthly Expenses" value="GH₵18,200" icon={TrendingDown} trend={{ value: 5, isPositive: false }} color="red" />
+            <StatCard 
+              title="Total Balance" 
+              value={`GH₵${Number(financeStats.net_profit || 0).toLocaleString()}`} 
+              icon={Wallet} 
+              color="blue" 
+            />
+            <StatCard 
+              title="Monthly Revenue" 
+              value={`GH₵${Number(monthlyStats.monthly_income || 0).toLocaleString()}`} 
+              icon={TrendingUp} 
+              color="green" 
+            />
+            <StatCard 
+              title="Monthly Expenses" 
+              value={`GH₵${Number(monthlyStats.monthly_expense || 0).toLocaleString()}`} 
+              icon={TrendingDown} 
+              color="red" 
+            />
           </div>
 
           {/* Recent Transactions */}
