@@ -11,80 +11,13 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
-  Filter,
-  ArrowUpRight
+  Filter
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import { leadAPI, authAPI, clientAPI } from '../services/api';
 import { Lead, Message, User } from '../types';
 
-const mockLeads: Lead[] = [
-  { 
-    id: '1', 
-    name: 'David Wallace', 
-    email: 'david@dundermifflin.com', 
-    phone: '+233 24 000 1111', 
-    source: 'Website', 
-    status: 'New', 
-    assigned_to: 1,
-    assigned_to_name: 'John Doe',
-    created_at: '2026-03-01T09:00:00.000Z',
-    updated_at: '2026-03-01T09:00:00.000Z',
-    communicationHistory: [
-      { id: 'm1', type: 'Note', content: 'Lead created via Website form.', date: '2026-03-01 09:00', sender: 'System' }
-    ]
-  },
-  { 
-    id: '2', 
-    name: 'Jan Levinson', 
-    email: 'jan@whitepages.com', 
-    phone: '+233 55 222 3333', 
-    source: 'Referral', 
-    status: 'Contacted', 
-    assigned_to: 2,
-    assigned_to_name: 'Sarah Smith',
-    created_at: '2026-02-28T10:00:00.000Z',
-    updated_at: '2026-03-01T11:15:00.000Z',
-    communicationHistory: [
-      { id: 'm2', type: 'Note', content: 'Lead created via Referral.', date: '2026-02-28 10:00', sender: 'System' },
-      { id: 'm3', type: 'SMS', content: 'Hello Jan, following up on your inquiry about life insurance.', date: '2026-02-28 14:30', sender: 'Sarah Smith' },
-      { id: 'm4', type: 'Note', content: 'Spoke with Jan. She is interested in the premium plan.', date: '2026-03-01 11:15', sender: 'Sarah Smith' }
-    ]
-  },
-  { 
-    id: '3', 
-    name: 'Ryan Howard', 
-    email: 'ryan@wuphf.com', 
-    phone: '+233 20 444 5555', 
-    source: 'Social Media', 
-    status: 'Qualified', 
-    assigned_to: 1,
-    assigned_to_name: 'John Doe',
-    created_at: '2026-02-25T08:45:00.000Z',
-    updated_at: '2026-03-01T16:00:00.000Z',
-    communicationHistory: [
-      { id: 'm5', type: 'Note', content: 'Lead created via Social Media.', date: '2026-02-25 08:45', sender: 'System' },
-      { id: 'm6', type: 'Email', content: 'Sent brochure for Auto Insurance.', date: '2026-02-26 13:20', sender: 'John Doe' },
-      { id: 'm7', type: 'Note', content: 'Qualified lead. Ready for policy creation.', date: '2026-03-01 16:00', sender: 'John Doe' }
-    ]
-  },
-  { 
-    id: '4', 
-    name: 'Toby Flenderson', 
-    email: 'toby@hr.com', 
-    phone: '+233 27 666 7777', 
-    source: 'Direct Call', 
-    status: 'Lost', 
-    assigned_to: 3,
-    assigned_to_name: 'Michael Scott',
-    created_at: '2026-02-20T15:30:00.000Z',
-    updated_at: '2026-02-22T10:00:00.000Z',
-    communicationHistory: [
-      { id: 'm8', type: 'Note', content: 'Lead created via Direct Call.', date: '2026-02-20 15:30', sender: 'System' },
-      { id: 'm9', type: 'Note', content: 'Not interested at this time.', date: '2026-02-22 10:00', sender: 'Michael Scott' }
-    ]
-  },
-];
+
 
 const LeadsView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -96,6 +29,7 @@ const LeadsView: React.FC = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [leadStats, setLeadStats] = useState<any>(null);
   const [newNote, setNewNote] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -158,13 +92,10 @@ const LeadsView: React.FC = () => {
         let paginationData;
         
         if (response.data && response.data.leads) {
-          // Backend returns { leads: [...], pagination: {...} }
           leadsData = response.data.leads.map(mapBackendLeadToFrontend);
           paginationData = response.data.pagination;
         } else if (Array.isArray(response.data)) {
-          // Backend returns array directly
           leadsData = response.data.map(mapBackendLeadToFrontend);
-          // Try to get pagination from headers or separate endpoint
           try {
             const countResponse = await leadAPI.getCount();
             const totalCount = countResponse.data?.count || leadsData.length;
@@ -184,15 +115,9 @@ const LeadsView: React.FC = () => {
             };
           }
         } else {
-          // Fallback to mock data if response structure is unexpected
-          console.warn('Unexpected response structure, using mock data');
-          leadsData = mockLeads;
-          paginationData = {
-            total: mockLeads.length,
-            limit,
-            offset: 0,
-            pages: 1
-          };
+          console.warn('Unexpected response structure');
+          leadsData = [];
+          paginationData = { total: 0, limit, offset: 0, pages: 1 };
         }
         
         setLeads(leadsData);
@@ -200,10 +125,9 @@ const LeadsView: React.FC = () => {
         setTotalLeads(paginationData.total || leadsData.length);
       } catch (error) {
         console.error('Error fetching leads:', error);
-        // Use mock data as fallback
-        setLeads(mockLeads);
+        setLeads([]);
         setTotalPages(1);
-        setTotalLeads(mockLeads.length);
+        setTotalLeads(0);
       } finally {
         setLoading(false);
       }
@@ -215,12 +139,21 @@ const LeadsView: React.FC = () => {
         setUsers(response.data);
       } catch (error) {
         console.error('Error fetching users:', error);
-        // Users will remain empty array if fetch fails
+      }
+    };
+
+    const fetchLeadStats = async () => {
+      try {
+        const response = await leadAPI.getStats();
+        setLeadStats(response.data);
+      } catch (error) {
+        console.error('Error fetching lead stats:', error);
       }
     };
 
     fetchLeads();
     fetchUsers();
+    fetchLeadStats();
   }, [currentPage, limit]);
 
   const handleStatusChange = async (id: string, newStatus: Lead['status']) => {
@@ -413,7 +346,7 @@ const LeadsView: React.FC = () => {
         } else if (Array.isArray(response.data)) {
           leadsData = response.data.map(mapBackendLeadToFrontend);
         } else {
-          leadsData = mockLeads;
+          leadsData = [];
         }
         setLeads(leadsData);
       };
@@ -468,29 +401,23 @@ const LeadsView: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <p className="text-xs font-bold text-slate-400 uppercase mb-1">Total Leads</p>
-          <h3 className="text-2xl font-bold text-slate-900">156</h3>
-          <div className="flex items-center mt-2 text-emerald-600">
-            <ArrowUpRight size={14} />
-            <span className="text-xs font-bold ml-1">+12% this month</span>
-          </div>
+          <h3 className="text-2xl font-bold text-slate-900">{leadStats?.totalLeads ?? totalLeads}</h3>
+          <p className="text-xs text-slate-400 mt-2">All time</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Conversion Rate</p>
-          <h3 className="text-2xl font-bold text-slate-900">24.5%</h3>
-          <div className="flex items-center mt-2 text-emerald-600">
-            <ArrowUpRight size={14} />
-            <span className="text-xs font-bold ml-1">+2.1% this month</span>
-          </div>
+          <p className="text-xs font-bold text-slate-400 uppercase mb-1">New Leads</p>
+          <h3 className="text-2xl font-bold text-slate-900">{leadStats?.newLeads ?? 0}</h3>
+          <p className="text-xs text-slate-400 mt-2">Awaiting contact</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Active Campaigns</p>
-          <h3 className="text-2xl font-bold text-slate-900">4</h3>
-          <p className="text-xs text-slate-400 mt-2">2 ending soon</p>
+          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Contacted</p>
+          <h3 className="text-2xl font-bold text-slate-900">{leadStats?.contactedLeads ?? 0}</h3>
+          <p className="text-xs text-slate-400 mt-2">In progress</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Avg. Response Time</p>
-          <h3 className="text-2xl font-bold text-slate-900">1.2h</h3>
-          <p className="text-xs text-slate-400 mt-2">Target: &lt; 2h</p>
+          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Qualified</p>
+          <h3 className="text-2xl font-bold text-slate-900">{leadStats?.qualifiedLeads ?? 0}</h3>
+          <p className="text-xs text-slate-400 mt-2">Converted to clients</p>
         </div>
       </div>
 
