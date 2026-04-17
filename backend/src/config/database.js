@@ -367,6 +367,16 @@ const initDB = async () => {
       )
     `);
 
+    await query(`
+      CREATE TABLE IF NOT EXISTS company_settings (
+        id SERIAL PRIMARY KEY,
+        company_name VARCHAR(255) DEFAULT 'Kesbridge',
+        tax_id VARCHAR(100) DEFAULT 'TX-99281-B',
+        office_address TEXT DEFAULT 'Mathehko-Acca Prime care',
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('Database tables initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);

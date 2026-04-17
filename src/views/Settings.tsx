@@ -27,7 +27,7 @@ import {
 import { cn, Role } from '../types';
 import Modal from '../components/Modal';
 import { useNotification } from '../components/Notification';
-import { smsConfigAPI, userAPI, commissionRateAPI, authAPI } from '../services/api';
+import { smsConfigAPI, userAPI, commissionRateAPI, authAPI, settingsAPI } from '../services/api';
 
 interface SettingsProps {
   role: Role;
@@ -45,6 +45,12 @@ const SettingsView: React.FC<SettingsProps> = ({ role }) => {
     email: '',
     phone_number: '',
     timezone: 'Accra (GMT+00:00)'
+  });
+
+  const [companyForm, setCompanyForm] = useState({
+    company_name: 'Kesbridge',
+    tax_id: 'TX-99281-B',
+    office_address: 'Mathehko-Acca Prime care'
   });
 
   useEffect(() => {
@@ -129,6 +135,16 @@ const SettingsView: React.FC<SettingsProps> = ({ role }) => {
       } catch (error) {
         console.error('Failed to update profile:', error);
         showError('Update Failed', 'Unable to update profile. Please try again.');
+      }
+    } else if (activeSection === 'company') {
+      try {
+        await settingsAPI.updateCompanyInfo(companyForm);
+        setIsSaved(true);
+        showSuccess('Success', 'Company info updated successfully!');
+        setTimeout(() => setIsSaved(false), 3000);
+      } catch (error) {
+        console.error('Failed to update company info:', error);
+        showError('Update Failed', 'Unable to update company information.');
       }
     } else {
       setIsSaved(true);
@@ -219,7 +235,25 @@ const SettingsView: React.FC<SettingsProps> = ({ role }) => {
     if (activeSection === 'commission-rates') {
       loadCommissionRates();
     }
+    if (activeSection === 'company') {
+      loadCompanyInfo();
+    }
   }, [activeSection]);
+
+  const loadCompanyInfo = async () => {
+    try {
+      const res = await settingsAPI.getCompanyInfo();
+      if (res.data) {
+        setCompanyForm({
+          company_name: res.data.company_name || '',
+          tax_id: res.data.tax_id || '',
+          office_address: res.data.office_address || ''
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load company info:', error);
+    }
+  };
 
   const loadSmsConfigs = async () => {
     try {
@@ -510,15 +544,30 @@ const SettingsView: React.FC<SettingsProps> = ({ role }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Company Name</label>
-                      <input type="text" defaultValue="Kesbridge" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none" />
+                      <input 
+                        type="text" 
+                        value={companyForm.company_name} 
+                        onChange={(e) => setCompanyForm({ ...companyForm, company_name: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none" 
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Tax ID / Registration</label>
-                      <input type="text" defaultValue="TX-99281-B" className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none" />
+                      <input 
+                        type="text" 
+                        value={companyForm.tax_id} 
+                        onChange={(e) => setCompanyForm({ ...companyForm, tax_id: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none" 
+                      />
                     </div>
                     <div className="md:col-span-2 space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Office Address</label>
-                      <textarea rows={3} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none resize-none" defaultValue="Mathehko-Acca Prime care"></textarea>
+                      <textarea 
+                        rows={3} 
+                        value={companyForm.office_address}
+                        onChange={(e) => setCompanyForm({ ...companyForm, office_address: e.target.value })}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 outline-none resize-none" 
+                      />
                     </div>
                   </div>
                 </div>

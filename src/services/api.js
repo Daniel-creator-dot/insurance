@@ -289,4 +289,10 @@ export const payrollAPI = {
   getReconciliationByStaffAndMonth: (staffId, month) => api.get(`/payroll/reconciliation/${staffId}/${month}`),
 };
 
+// Settings / Company Settings endpoints
+export const settingsAPI = {
+  getCompanyInfo: () => api.get('/company-settings'),
+  updateCompanyInfo: (data) => api.put('/company-settings', data),
+};
+
 export default api;

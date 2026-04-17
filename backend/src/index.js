@@ -25,6 +25,7 @@ const chequesRoutes = require('./routes/cheques');
 const paymentVoucherRoutes = require('./routes/payment-vouchers');
 const banksRoutes = require('./routes/banks');
 const payrollRoutes = require('./routes/payroll');
+const companySettingsRoutes = require('./routes/companySettings');
 
 const { initDB } = require('./config/database');
 
@@ -99,6 +100,7 @@ app.use('/api/cheques', verifyToken, chequesRoutes);
 app.use('/api/payment-vouchers', verifyToken, paymentVoucherRoutes);
 app.use('/api/banks', verifyToken, banksRoutes);
 app.use('/api/payroll', verifyToken, payrollRoutes);
+app.use('/api/company-settings', verifyToken, companySettingsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
